@@ -1,0 +1,16 @@
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: podinfo-updater
+  namespace: argocd
+spec:
+  writeBackConfig:
+    method: "git:repocreds"
+  applicationRefs:
+    - namePattern: "podinfo-03"
+      images:
+        - alias: podinfo
+          imageName: 183255892104.dkr.ecr.us-east-1.amazonaws.com/citadel_repository
+          commonUpdateSettings:
+            updateStrategy: newest-build
+            allowTags: "regexp:^[a-f0-9]{7,8}$"

@@ -1,0 +1,49 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: project-citadel-apps
+  namespace: argocd
+
+spec:
+  generators:
+
+  - list:
+      elements:
+      - appName: prep-01
+        path: prep-argocd-01/
+        destNamespace: argocd
+      - appName: gateway-api-02
+        path: custom-resources-02/gateway-api
+        destNamespace: podinfo
+      - appName: kyverno-02
+        path: custom-resources-02/kyverno
+        destNamespace: kyverno
+      - appName: podinfo-03
+        path: podinfo-03
+        destNamespace: podinfo
+
+  template:
+    metadata:
+      name: '{{appName}}'
+    spec:
+      project: default
+      source:
+        repoURL: https://gitlab.com/shotorouu/project-citadel-k8s.git
+        targetRevision: main
+        path: 'k8s/{{path}}'
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: '{{destNamespace}}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+        - CreateNamespace=true
+        - ServerSideApply=true
+
+      ignoreDifferences:
+        - group: apiextensions.k8s.io
+          kind: CustomResourceDefinition
+          jsonPointers:
+            - /metadata/annotations
