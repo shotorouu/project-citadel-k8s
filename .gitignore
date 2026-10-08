@@ -1,10 +1,8 @@
 # Local .terraform directories
 .terraform/
 
-# .tfstate files 
 *.tfstate
 *.tfstate.*
-./main/pattoken.txt
 
 # Crash log files
 crash.log
@@ -43,3 +41,6 @@ terraform.rc
 # Optional: ignore plan files saved before destroying Terraform configuration
 # Uncomment the line below if you want to ignore planout files.
 # planout
+
+# ArgoCD UI script
+argocd.sh

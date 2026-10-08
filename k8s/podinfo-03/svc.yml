@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: citadel-gateway-svc
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  type: ClusterIP
+  selector:
+    name: podinfo
+  ports:
+    - name: http
+      port: 9898
+      targetPort: 9898
+      protocol: TCP

@@ -1,0 +1,66 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+  name: podinfo
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      name: podinfo
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8000"
+        prometheus.io/path: "/metrics"
+      labels:
+        name: podinfo
+    spec:
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10000
+        runAsGroup: 10000
+        fsGroup: 10000
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              name: podinfo
+      containers:
+        - name: podinfo
+          image: 183255892104.dkr.ecr.us-east-1.amazonaws.com/citadel_repository:690fc648
+          imagePullPolicy: Always
+          ports:
+            - name: api
+              containerPort: 9898
+          resources:
+            requests:
+              cpu: "125m"
+              memory: "128Mi"
+            limits:
+              cpu: "250m"
+              memory: "256Mi"
+
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 9898
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 9898
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: 9898
