@@ -12,6 +12,8 @@ module "vpc" {
 
 module "oidc" {
   source = "./oidc"
+  ecr_repository_arn = module.aws_ecr_repository.repository_arn
+  reports_bucket_arn = module.s3_reports.bucket_arn
 }
 
 module "eks" {
