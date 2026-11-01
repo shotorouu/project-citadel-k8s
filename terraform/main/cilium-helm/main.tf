@@ -4,6 +4,7 @@ resource "helm_release" "cilium" {
   chart      = "cilium"
   version    = "1.16.5"
   namespace  = "kube-system"
+  wait 	     = false
 
 values = [
     yamlencode({

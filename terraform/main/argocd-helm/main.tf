@@ -6,9 +6,12 @@ resource "helm_release" "argocd" {
   create_namespace = true
   namespace        = "argocd"
 
-  values = [
+ values = [
     yamlencode({
       configs = {
+        cm = {
+          "kustomize.buildOptions" = "--enable-helm"
+        }
         repositories = {
           private-repo = {
             url      = "https://gitlab.com/shotorouu/project-citadel-k8s.git"
