@@ -6,7 +6,10 @@ module "eks" {
   kubernetes_version = var.k8s_version
 
   addons = {
-    coredns                = {}
+    coredns                = {
+      resolve_conflicts_on_create = "OVERWRITE"
+      resolve_conflicts_on_update = "OVERWRITE"
+    }
     eks-pod-identity-agent = {
       before_compute = true
     }
@@ -28,26 +31,10 @@ module "eks" {
   node_security_group_id     = var.sg_id
   security_group_id          = var.sg_id
 
-  # EKS Managed
-  eks_managed_node_groups = {
-    cillium-ng = {
-      ami_type       = "AL2023_x86_64_STANDARD"
-      instance_types = ["t3.small"]
-
-      min_size     = 2
-      max_size     = 8
-      desired_size = 3
-
-      iam_role_additional_policies = {
-        AmazonEC2ContainerRegistryReadOnly = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
-      }
-
-    }
-  }
-
   tags = {
     Environment = "eks"
     Terraform   = "true"
   }
 }
+
 

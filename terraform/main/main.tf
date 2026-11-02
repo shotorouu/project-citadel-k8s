@@ -31,6 +31,13 @@ module "cilium" {
   eks_oidc_issuer_url   = module.eks.oidc_issuer_url
 }
 
+module "nodegroup" {
+  source     	  = "./nodegroup"
+  depends_on      = [module.cilium]
+  cluster_name    = module.eks.cluster_name
+  subnet_ids      = module.vpc.private_subnets
+}
+
 module "kyverno" {
   source     = "./kyverno-helm"
   depends_on = [module.eks]
