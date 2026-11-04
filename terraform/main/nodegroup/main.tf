@@ -1,3 +1,32 @@
+resource "aws_launch_template" "cillium_ng" {
+  name_prefix = "cillium-ng"
+
+  # Increasing the maxPods alloc.
+  metadata_options {
+    http_endpoint               = "enabled"
+    http_tokens                 = "required"
+    http_put_response_hop_limit = 2
+  }
+
+  user_data = base64encode(<<-EOT
+    MIME-Version: 1.0
+    Content-Type: multipart/mixed; boundary="//"
+
+    --//
+    Content-Type: application/node.eks.aws
+
+    ---
+    apiVersion: node.eks.aws/v1alpha1
+    kind: NodeConfig
+    spec:
+      kubelet:
+        config:
+          maxPods: 30
+    --//--
+  EOT
+  )
+}
+
 resource "aws_eks_node_group" "cillium_ng" {
   node_group_name = "cillium-ng"
   cluster_name    = var.cluster_name
@@ -12,7 +41,21 @@ resource "aws_eks_node_group" "cillium_ng" {
 
   instance_types = ["t3.small"]
   ami_type       = "AL2023_x86_64_STANDARD"
+
+  launch_template {
+    id      = aws_launch_template.cillium_ng.id
+    version = aws_launch_template.cillium_ng.latest_version
+  }
+
+  update_config {
+    max_unavailable = 1
+  }
+
+  lifecycle {
+    ignore_changes = [scaling_config[0].desired_size]
+  }
 }
+
 
 
 resource "aws_iam_role" "node" {
