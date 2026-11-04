@@ -15,17 +15,14 @@ values = [
       ipam = {
         mode = "eni"
       }
-      aws = {
-        aws-min-allocate = 8
-        aws-pre-allocate = 4
-      }
+
       eni = {
         enabled = true
+	awsEnablePrefixDelegation  = true
       }
 
       routingMode                = "native"
       egressMasqueradeInterfaces = "ens+" # amazon nitor pci slots feature
-      enableIPv4PrefixDelegation = true
       enableIPv4Masquerade       = true
       enableBPFMasquerade        = false
 
