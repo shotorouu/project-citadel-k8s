@@ -2,12 +2,21 @@ resource "aws_iam_policy" "ecr_token_refresher" {
   name = "ecr-token-refresher-policy"
   path = "/"
 
-  policy = jsonencode({
+policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
+        Effect   = "Allow"
+        Action   = ["ecr:GetAuthorizationToken"]
+        Resource = "*"
+      },
+      {
         Effect = "Allow"
-        Action = ["ecr:GetAuthorizationToken"]
+        Action = [
+          "ecr:ListImages",
+          "ecr:BatchGetImage",
+          "ecr:GetDownloadUrlForLayer"
+        ]
         Resource = "*"
       }
     ]
